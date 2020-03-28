@@ -1,0 +1,140 @@
+#include<bits/stdc++.h>
+
+#define     ll      long long
+#define     pb      push_back
+#define     eps     1e-9
+#define     ff      first
+#define     ss      second
+#define     pi      acos(-1)
+#define     Fast_Read                    ios_base::sync_with_stdio(false); cin.tie(nullptr);  cout.tie(nullptr);
+#define     Precision(x)                 cout.setf(ios::fixed); cout.precision(x);
+
+using namespace std;
+typedef long double ld;
+#ifdef ARnAb
+     #define debug(...) __f(#__VA_ARGS__, __VA_ARGS__)
+    template < typename Arg1 >
+    void __f(const char* name, Arg1&& arg1){
+        cerr << name << " is " << arg1 << std::endl;
+    }
+    template < typename Arg1, typename... Args>
+    void __f(const char* names, Arg1&& arg1, Args&&... args){
+        const char* comma = strchr(names+1, ',');
+        cerr.write(names, comma - names) << " is " << arg1 <<"  ";
+        __f(comma+1, args...);
+    }
+#else
+    #define debug(...)
+#endif
+///******************************************START******************************************
+int cs=0;
+int node;
+vector<int> adj[200005];
+int dis[200005];
+int spars_table[25][200005];
+
+void dfs(int sp,int par)
+{
+    for(int i=0;i<adj[sp].size();i++)
+    {
+        if(adj[sp][i]==par)      continue;
+        int x=adj[sp][i];
+        spars_table[0][x]=sp;
+        dis[x]=dis[sp]+1;
+        dfs(x,sp);
+    }
+}
+
+void genSparsTable()
+{
+    for(int i=1;i<19;i++)
+    {
+        for(int j=1;j<=node;j++)
+        {
+            int x=spars_table[i-1][j];
+            if(x!=-1)
+            {
+                spars_table[i][j]=spars_table[i-1][x];
+            }
+        }
+    }
+}
+int levelUp(int a,int b)
+{
+    int dif=dis[b]-dis[a];
+    while(dif>0)
+    {
+        int x=log2(dif);
+        b=spars_table[x][b];
+        dif-=(1<<x);
+    }
+    return b;
+}
+int LCA(int a,int b){
+    if(dis[a]>dis[b]) swap(a,b);
+    b=levelUp(a,b);
+    if(a==b) return a;
+    for(int i=18;i>=0;i--){
+        int x=spars_table[i][a];
+        int y=spars_table[i][b];
+        if(x==y|| x==-1 || y==-1)
+            continue;
+        else a=x,b=y;
+    }
+    return spars_table[0][a];
+}
+void solve()
+{
+    memset(spars_table,-1,sizeof spars_table);
+    cin>>node;
+    for(int i=1;i<node;i++)
+    {
+        int a,b;
+        cin>>a>>b;
+        adj[a].pb(b);
+        adj[b].pb(a);
+    }
+    dfs(1,0);
+    genSparsTable();
+    int q;
+    cin>>q;
+    while(q--)
+    {
+        int r,u,v;
+        cin>>r>>u>>v;
+        int uv=LCA(u,v);
+        int ruv=LCA(r,uv);
+        if(ruv==uv)
+        {
+            int ur=LCA(u,r);
+            int vr=LCA(v,r);
+            if((dis[r]-dis[ur])<(dis[r]-dis[vr]))
+            {
+                cout<<ur<<endl;
+            }
+            else
+                cout<<vr<<endl;
+        }
+        else
+        {
+            cout<<uv<<endl;
+        }
+    }
+}
+int main()
+{
+    Fast_Read
+    Precision(2)
+    #ifdef ARnAb
+        double start_time = clock();
+        ///freopen ("output.txt","w",stdout);
+        ///freopen ("input.txt","r",stdin);
+    #endif
+
+    int tc=1;
+    ///cin>>tc;
+    while(tc--)
+        solve();
+    return 0;
+}
+
