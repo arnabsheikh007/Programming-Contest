@@ -1,4 +1,7 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+
 
 #define     pb      push_back
 #define     eps     1e-9
@@ -14,19 +17,25 @@
 #define     Precision(x)                 cout.setf(ios::fixed); cout.precision(x);
 
 using namespace std;
+using namespace __gnu_pbds;
 typedef long double ld;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef vector<int> vii;
 typedef vector<ll> vll;
-template < class T> inline T biton(T n,T pos){return n |((T)1<<pos);}
+template < class T> inline T biton(T n,T pos){return n ((T)1<<pos);}
 template < class T> inline T bitoff(T n,T pos){return n & ~((T)1<<pos);}
 template < class T> inline T ison(T n,T pos){return (bool)(n & ((T)1<<pos));}
 template < class T> inline T gcd(T a, T b){while(b){a%=b;swap(a,b);}return a;}
+template<typename T>
+using ordered_set=tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<typename T>
+using ordered_multiset=tree<T, null_type, less_equal<T>, rb_tree_tag,tree_order_statistics_node_update>;
 inline int nxt(){int aaa;scanf("%d",&aaa);return aaa;}
 inline ll lxt(){ll aaa;scanf("%lld",&aaa);return aaa;}
 inline double dxt(){double aaa;scanf("%lf",&aaa);return aaa;}
-inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++) cin>>in; v.push_back(in); }
+inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++){cin>>in; v.push_back(in);} }
+inline void vout(vector<int> v){ for(auto it:v) cout<<it<<" "; cout<<endl; }
 #ifdef ARnAb
      #define debug(...) __f(#__VA_ARGS__, __VA_ARGS__)
     template < typename Arg1 >
@@ -44,9 +53,36 @@ inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++) cin>>in; v.pus
 #endif
 ///******************************************START******************************************
 int cs=0;
+int mod=1000000007;
+ll factorial[100005];
+void fact()
+{
+    ll ans=1;
+    for(int i=1;i<=100000;i++)
+    {
+        ans*=i;
+        ans%=mod;
+        factorial[i]=ans;
+    }
+}
 void solve()
 {
-
+    int n;
+    cin>>n;
+    vii v;
+    vinput(n,v);
+    ll ans=0;
+    ordered_set<int>st;
+    for(int i=0;i<n-1;i++)
+    {
+        int x=0;
+        st.insert(v[i]);
+        int pos=st.order_of_key(v[i]);
+        x=v[i]-1-pos;
+        ans+=x*factorial[n-i-1];
+        ans%=mod;
+    }
+    cout<<ans<<endl;
 }
 int main()
 {
@@ -57,6 +93,7 @@ int main()
         ///freopen ("output.txt","w",stdout);
         ///freopen ("input.txt","r",stdin);
     #endif
+    fact();
     int tc=1;
     cin>>tc;
     while(tc--)

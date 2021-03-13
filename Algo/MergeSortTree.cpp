@@ -19,7 +19,7 @@ typedef long long ll;
 typedef pair<int,int> pii;
 typedef vector<int> vii;
 typedef vector<ll> vll;
-template < class T> inline T biton(T n,T pos){return n ((T)1<<pos);}
+template < class T> inline T biton(T n,T pos){return n  ((T)1<<pos);}
 template < class T> inline T bitoff(T n,T pos){return n & ~((T)1<<pos);}
 template < class T> inline T ison(T n,T pos){return (bool)(n & ((T)1<<pos));}
 template < class T> inline T gcd(T a, T b){while(b){a%=b;swap(a,b);}return a;}
@@ -45,107 +45,66 @@ const ll M = 1e9+7;
     #define debug(...)
 #endif
 ///******************************************START******************************************
-const int N = 100010;
 int cs=0;
-string ss;
-struct info
+vector< vector<int> > Tree;
+vector< int > next_right;
+void build_Tree(ll node,ll s,ll e)
 {
-    ll sum;
-    ll lazy;
-
-} tree[N*4];
-void segment_tree(int node,int low,int high)
-{
-    if(low==high)
+    if(s==e)
     {
-        tree[node].sum=ss[low]-'0';
+        Tree[node].pb(next_right[s]);
         return;
     }
-    int left=2*node;
-    int right=2*node+1;
-    int mid=(low+high)/2;
-    segment_tree(left,low,mid);
-    segment_tree(right,mid+1,high);
-    tree[node].sum=tree[left].sum+tree[right].sum;
+    ll mid = (s+e)>>1 ;
+    ll left = node<<1;
+    ll right = left|1 ;
+;
+    build_Tree(left,s,mid);
+    build_Tree(right,mid+1,e);
+    Tree[node].resize(Tree[left].size()+Tree[right].size());
+    merge(Tree[left].begin(),Tree[left].end(),Tree[right].begin(),Tree[right].end(),Tree[node].begin());
+
 }
-void propagate(int node,int low,int hi)
+ll Query(ll node,ll s,ll e,ll l,ll r,ll val)
 {
-    int left=2*node;
-    int right=left+1;
-    int mid =(low+hi)/2;
-    tree[node].sum+=(hi-low+1)*tree[node].lazy;
-    if(hi!=low)
+    if(l>e || r<s)  return 0;
+    if(s>=l && e<=r)
     {
-        tree[left].lazy+=tree[node].lazy;
-        tree[right].lazy+=tree[node].lazy;
+        return (ll)(Tree[node].end() - upper_bound(Tree[node].begin(),Tree[node].end(),val));
     }
-    tree[node].lazy=0;
-}
-void update(int node,int low,int hi,int i,int j,int value)
-{
-    int left=2*node;
-    int right=left+1;
-    if(tree[node].lazy)propagate(node,low,hi);
-    if(hi<i||j<low) return;
-    if(low>=i&&hi<=j)
-    {
-        tree[node].sum+=(hi-low+1)*value;
-        if(hi!=low)
-        {
-            tree[left].lazy+=value;
-            tree[right].lazy+=value;
-        }
-        tree[node].lazy=0;
-        return ;
-    }
-    int mid=(low+hi)/2;
-    update(left,low,mid,i,j,value);
-    update(right,mid+1,hi,i,j,value);
-    tree[node].sum=tree[left].sum+tree[right].sum;
-}
-ll query(int node,int low,int hi,int i,int j)
-{
-    int left=2*node;
-    int right=left+1;
-    if(tree[node].lazy)propagate(node,low,hi);
-    if(hi<i||j<low) return 0;
-    if(low>=i&&hi<=j)
-        return tree[node].sum;
-    int mid=(low+hi)/2;
-    ll x= query(left,low,mid,i,j);
-    ll y= query(right,mid+1,hi,i,j);
-    return x+y;
+    ll mid = (s+e)>>1 ;
+    ll left = node<<1;
+    ll right = left|1 ;
+    ll xx = Query(left,s,mid,l,r,val);
+    ll yy =Query(right,mid+1,e,l,r,val);
+    return xx+yy;
 
 }
 void solve()
 {
-
-    memset(tree,0,sizeof tree);
-    cin>>ss;
-    ss="x"+ss;
-    int n = ss.size();
-    segment_tree(1,1,n);
-    int q;
-    cin>>q;
-    cout<<"Case "<<++cs<<":"<<endl;
-    while(q--)
+    int n,k;
+    cin>>n>>k;
+    Tree.assign(4*n,vector<int>());
+    vector<int> lastIndex(100010,-1);
+    next_right.assign(n+5,n+1);
+    for(int i=1;i<=n;i++)
     {
-        char c;
-        cin>>c;
-        if(c=='I')
-        {
-            ll i,j;
-            cin>>i>>j;
-            update(1,1,n,i,j,1);
-        }
-        else
-        {
-            ll x;
-            cin>>x;
-            int ans  = query(1,1,n,x,x);
-            cout<<ans%2<<endl;
-        }
+        int in;
+        cin>>in;
+        if(lastIndex[in]!=-1)
+            next_right[lastIndex[in]]=i;
+        lastIndex[in]=i;
     }
+    ///vout(next_right);
+    build_Tree(1,1,n);
+    cout<<"Case "<<++cs<<":"<<endl;
+    while(k--)
+    {
+        int l,r;
+        cin>>l>>r;
+        cout<<Query(1,1,n,l,r,r)<<endl;
+    }
+
 }
 int main()
 {

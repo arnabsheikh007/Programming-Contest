@@ -5,8 +5,7 @@
 #define     ff      first
 #define     ss      second
 #define     pi      acos(-1)
-#define     inf     INT_MAX/2;
-#define     INF     LLONG_MAX/2;
+#define     inf     1e18
 #define     mset(a,x)                    memset(a,(x),sizeof(a))
 #define     all(x)                       x.begin(),x.end()
 #define     allr(x)                      x.rbegin(),x.rend()
@@ -17,16 +16,9 @@ using namespace std;
 typedef long double ld;
 typedef long long ll;
 typedef pair<int,int> pii;
-typedef vector<int> vii;
-typedef vector<ll> vll;
-template < class T> inline T biton(T n,T pos){return n |((T)1<<pos);}
-template < class T> inline T bitoff(T n,T pos){return n & ~((T)1<<pos);}
-template < class T> inline T ison(T n,T pos){return (bool)(n & ((T)1<<pos));}
-template < class T> inline T gcd(T a, T b){while(b){a%=b;swap(a,b);}return a;}
 inline int nxt(){int aaa;scanf("%d",&aaa);return aaa;}
 inline ll lxt(){ll aaa;scanf("%lld",&aaa);return aaa;}
 inline double dxt(){double aaa;scanf("%lf",&aaa);return aaa;}
-inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++) cin>>in; v.push_back(in); }
 #ifdef ARnAb
      #define debug(...) __f(#__VA_ARGS__, __VA_ARGS__)
     template < typename Arg1 >
@@ -44,9 +36,65 @@ inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++) cin>>in; v.pus
 #endif
 ///******************************************START******************************************
 int cs=0;
+int node,edge;
+vector< vector< pair<int,int> > > adj;
+vector<ll>dis;
+vector<int>par;
+void djkstra(int sp){
+    priority_queue< pair<int,int> > pq;
+    pq.push({0,sp});
+    dis[sp]=0;
+    while(!pq.empty())
+    {
+        auto top=pq.top();
+        pq.pop();
+        int u=top.ss;
+        for(int i=0;i<adj[u].size();i++)
+        {
+            int v=adj[u][i].ff;
+            if(dis[u]+adj[u][i].ss<dis[v])
+            {
+                dis[v]=dis[u]+adj[u][i].ss;
+                pq.push({-dis[v],v});
+                par[v]=u;
+            }
+        }
+    }
+}
 void solve()
 {
-
+    cin>>node>>edge;
+    adj.resize(node+1);
+    dis.assign(node+1, inf);
+    par.assign(node+1, -1);
+    for(int i=0;i<edge;i++)
+    {
+        int u,v,x;
+        cin>>u>>v>>x;
+        adj[u].pb({v,x});
+        adj[v].pb({u,x});
+    }
+    djkstra(1);
+    int x=node;
+    if(dis[x]==inf)
+    {
+        cout<<-1<<endl;
+        return;
+    }
+    deque<int>dq;
+    dq.push_front(x);
+    while(par[x]!=-1)
+    {
+        int xx=par[x];
+        dq.push_front(xx);
+        x=xx;
+    }
+    while(!dq.empty())
+    {
+        int p=dq.front();
+        dq.pop_front();
+        cout<<p<<" ";
+    }
 }
 int main()
 {
@@ -58,7 +106,7 @@ int main()
         ///freopen ("input.txt","r",stdin);
     #endif
     int tc=1;
-    cin>>tc;
+   // cin>>tc;
     while(tc--)
         solve();
     return 0;

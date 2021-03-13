@@ -45,107 +45,49 @@ const ll M = 1e9+7;
     #define debug(...)
 #endif
 ///******************************************START******************************************
-const int N = 100010;
 int cs=0;
-string ss;
-struct info
-{
-    ll sum;
-    ll lazy;
-
-} tree[N*4];
-void segment_tree(int node,int low,int high)
-{
-    if(low==high)
-    {
-        tree[node].sum=ss[low]-'0';
-        return;
-    }
-    int left=2*node;
-    int right=2*node+1;
-    int mid=(low+high)/2;
-    segment_tree(left,low,mid);
-    segment_tree(right,mid+1,high);
-    tree[node].sum=tree[left].sum+tree[right].sum;
-}
-void propagate(int node,int low,int hi)
-{
-    int left=2*node;
-    int right=left+1;
-    int mid =(low+hi)/2;
-    tree[node].sum+=(hi-low+1)*tree[node].lazy;
-    if(hi!=low)
-    {
-        tree[left].lazy+=tree[node].lazy;
-        tree[right].lazy+=tree[node].lazy;
-    }
-    tree[node].lazy=0;
-}
-void update(int node,int low,int hi,int i,int j,int value)
-{
-    int left=2*node;
-    int right=left+1;
-    if(tree[node].lazy)propagate(node,low,hi);
-    if(hi<i||j<low) return;
-    if(low>=i&&hi<=j)
-    {
-        tree[node].sum+=(hi-low+1)*value;
-        if(hi!=low)
-        {
-            tree[left].lazy+=value;
-            tree[right].lazy+=value;
-        }
-        tree[node].lazy=0;
-        return ;
-    }
-    int mid=(low+hi)/2;
-    update(left,low,mid,i,j,value);
-    update(right,mid+1,hi,i,j,value);
-    tree[node].sum=tree[left].sum+tree[right].sum;
-}
-ll query(int node,int low,int hi,int i,int j)
-{
-    int left=2*node;
-    int right=left+1;
-    if(tree[node].lazy)propagate(node,low,hi);
-    if(hi<i||j<low) return 0;
-    if(low>=i&&hi<=j)
-        return tree[node].sum;
-    int mid=(low+hi)/2;
-    ll x= query(left,low,mid,i,j);
-    ll y= query(right,mid+1,hi,i,j);
-    return x+y;
-
-}
 void solve()
 {
-
-    memset(tree,0,sizeof tree);
-    cin>>ss;
-    ss="x"+ss;
-    int n = ss.size();
-    segment_tree(1,1,n);
-    int q;
-    cin>>q;
-    cout<<"Case "<<++cs<<":"<<endl;
-    while(q--)
+    int n;
+    cin>>n;
+    vector<string> s;
+    for(int i=0;i<n;i++)
     {
-        char c;
-        cin>>c;
-        if(c=='I')
+        string a;
+        cin>>a;
+        s.pb(a);
+    }
+    string t;
+    cin>>t;
+    vii ans;
+    for(int i=0;i<n;i++)
+    {
+        int x=0;
+        for(int j=0;j<s[i].size();j++)
         {
-            ll i,j;
-            cin>>i>>j;
-            update(1,1,n,i,j,1);
-        }
-        else
-        {
-            ll x;
-            cin>>x;
-            int ans  = query(1,1,n,x,x);
-            cout<<ans%2<<endl;
+            if(s[i][j]==t[x])
+            {
+                x++;
+                if(x>=t.size())
+                {
+                    ans.pb(i+1);
+                    break;
+                }
+            }
         }
     }
+    cout<<"Case "<<++cs<<":"<<endl;
+    if(ans.size()==0)
+    {
+        cout<<"No files found!"<<endl;
+        return;
+    }
+    for(int i=0;i<ans.size();i++)
+    {
+        if(i!=0)    cout<<" ";
+        cout<<ans[i];
+    }
+    cout<<endl;
 }
 int main()
 {

@@ -45,107 +45,41 @@ const ll M = 1e9+7;
     #define debug(...)
 #endif
 ///******************************************START******************************************
-const int N = 100010;
 int cs=0;
-string ss;
-struct info
-{
-    ll sum;
-    ll lazy;
-
-} tree[N*4];
-void segment_tree(int node,int low,int high)
-{
-    if(low==high)
-    {
-        tree[node].sum=ss[low]-'0';
-        return;
-    }
-    int left=2*node;
-    int right=2*node+1;
-    int mid=(low+high)/2;
-    segment_tree(left,low,mid);
-    segment_tree(right,mid+1,high);
-    tree[node].sum=tree[left].sum+tree[right].sum;
-}
-void propagate(int node,int low,int hi)
-{
-    int left=2*node;
-    int right=left+1;
-    int mid =(low+hi)/2;
-    tree[node].sum+=(hi-low+1)*tree[node].lazy;
-    if(hi!=low)
-    {
-        tree[left].lazy+=tree[node].lazy;
-        tree[right].lazy+=tree[node].lazy;
-    }
-    tree[node].lazy=0;
-}
-void update(int node,int low,int hi,int i,int j,int value)
-{
-    int left=2*node;
-    int right=left+1;
-    if(tree[node].lazy)propagate(node,low,hi);
-    if(hi<i||j<low) return;
-    if(low>=i&&hi<=j)
-    {
-        tree[node].sum+=(hi-low+1)*value;
-        if(hi!=low)
-        {
-            tree[left].lazy+=value;
-            tree[right].lazy+=value;
-        }
-        tree[node].lazy=0;
-        return ;
-    }
-    int mid=(low+hi)/2;
-    update(left,low,mid,i,j,value);
-    update(right,mid+1,hi,i,j,value);
-    tree[node].sum=tree[left].sum+tree[right].sum;
-}
-ll query(int node,int low,int hi,int i,int j)
-{
-    int left=2*node;
-    int right=left+1;
-    if(tree[node].lazy)propagate(node,low,hi);
-    if(hi<i||j<low) return 0;
-    if(low>=i&&hi<=j)
-        return tree[node].sum;
-    int mid=(low+hi)/2;
-    ll x= query(left,low,mid,i,j);
-    ll y= query(right,mid+1,hi,i,j);
-    return x+y;
-
-}
 void solve()
 {
+    int n;
+    cin>>n;
+    vii v(n+5);
+    v[0]=v[n+1]=INT_MAX;
+    for(int i=1;i<=n;i++)   cin>>v[i];
 
-    memset(tree,0,sizeof tree);
-    cin>>ss;
-    ss="x"+ss;
-    int n = ss.size();
-    segment_tree(1,1,n);
-    int q;
-    cin>>q;
-    cout<<"Case "<<++cs<<":"<<endl;
-    while(q--)
+    stack<int> st1,st2;
+    st1.push(0);
+    st2.push(n+1);
+    vector<int>l(n+5),r(n+5);
+    for(int i=1;i<=n;i++)
     {
-        char c;
-        cin>>c;
-        if(c=='I')
-        {
-            ll i,j;
-            cin>>i>>j;
-            update(1,1,n,i,j,1);
-        }
-        else
-        {
-            ll x;
-            cin>>x;
-            int ans  = query(1,1,n,x,x);
-            cout<<ans%2<<endl;
-        }
+        while(v[st1.top()]<v[i])    st1.pop();
+        l[i]=st1.top();
+        st1.push(i);
     }
+    for(int i=n;i>0;i--)
+    {
+        while(v[st2.top()]<v[i])    st2.pop();
+        r[i]=st2.top();
+        st2.push(i);
+    }
+
+    set<int> s;
+    for(int i=1;i<=n;i++)
+    {
+        if(l[i]!=0)
+            s.insert(v[l[i]]-v[i]);
+        if(r[i]!=n+1)
+            s.insert(v[r[i]]-v[i]);
+    }
+    cout<<s.size()<<endl;
 }
 int main()
 {

@@ -36,83 +36,96 @@ ll input()
 ll cs=0;
 vector<ll>v;
 struct data{
-    ll val=0;
-    ll prop=0;
+    ll val;
     data(ll _val)
     {
         val=_val;
-        prop=0;
     }
     data(){val=0;}
 };
 data tree[4*100005];
-//void buildTree(ll node,ll s,ll e)
-//{
-//    if(s==e)
-//    {
-//        tree[node].data(0);
-//        return;
-//    }
-//    ll mid=(s+e)/2;
-//    ll left=2*node+1;
-//    ll right=left+1;
-//    buildTree(left,s,mid);
-//    buildTree(right,mid+1,e);
-//    tree[node].val=tree[left].val+tree[right].val;
-//}
-
-void propagate(ll node,ll s,ll e,ll i,ll j,ll carry)
+void buildTree(ll node,ll s,ll e)
 {
-    if(j<s || i>e)  return;
-    if(i<=s && j>=e)
+    if(s==e)
     {
-        tree[node].val+=(carry+1)%3;
-        tree[node].prop=(carry+1)%3;
+        tree[node].val=v[s];
         return;
     }
     ll mid=(s+e)/2;
     ll left=2*node;
     ll right=left+1;
-    propagate(left,s,mid,i,j,v);
-    propagate(right,mid+1,e,i,j,v);
-    tree[node].val=tree[left].val+tree[right].val+((e-s+1)*tree[node].prop);
+    buildTree(left,s,mid);
+    buildTree(right,mid+1,e);
+    tree[node].val=tree[left].val+tree[right].val;
 }
-
-ll query(ll node,ll s,ll e,ll i,ll j,ll carry=0)
+void update(ll node,ll s,ll e,ll i,ll v)
 {
-    if(j<s || i>e)  return 0LL;
-    if(i<=s && j>=e)
+    if(i<s || i>e)  return;
+    if(s==e)
     {
-        return tree[node].val+((e-s+1)*carry);
+        if(s==i)
+        {
+            tree[node].val+=v;
+            return;
+        }
+        else
+            return;
     }
     ll mid=(s+e)/2;
     ll left=2*node;
     ll right=left+1;
-    ll x= query(left,s,mid,i,j,carry+tree[node].prop);
-    ll y= query(right,mid+1,e,i,j,carry+tree[node].prop);
+    update(left,s,mid,i,v);
+    update(right,mid+1,e,i,v);
+    tree[node].val=tree[left].val+tree[right].val;
+}
+ll query(ll node,ll s,ll e,ll i,ll j)
+{
+    if(j<s || i>e)
+    {
+        return 0;
+    }
+    if(i<=s && j>=e)
+    {
+        return tree[node].val;
+    }
+    ll mid=(s+e)/2;
+    ll left=2*node;
+    ll right=left+1;
+    ll x= query(left,s,mid,i,j);
+    ll y= query(right,mid+1,e,i,j);
     return x+y;
 }
 void solve()
 {
     memset(tree,0,sizeof tree);
-    ll n=input();
-    ll q=input();
-    printf("Case %lld:\n",++cs);
+    v.clear();
+    ll n=input(),q=input();
+    for(ll i=0;i<n;i++)
+    {
+        ll in=input();
+        v.pb(in);
+    }
+    buildTree(1,0,n-1);
+    printf("Case %d:\n",++cs);
     while(q--)
     {
         ll op=input();
-        if(op==0)
-        {
-            ll i=input(),j=input(),v=input();
-            ///i++,j++;
-            propagate(1,1,n,i,j,v);
-        }
         if(op==1)
         {
+            ll i=input();
+            ll x=query(1,0,n-1,i,i);
+            printf("%lld\n",x);
+            update(1,0,n-1,i,-x);
+        }
+        else if(op==2)
+        {
+            ll i=input(),v=input();
+            update(1,0,n-1,i,v);
+        }
+        else if(op==3)
+        {
             ll i=input(),j=input();
-            ///i++,j++;
-            ll ans=query(1,1,n,i,j,0);
-            cout<<ans<<endl;
+            printf("%lld\n",query(1,0,n-1,i,j));
         }
     }
 }

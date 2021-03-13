@@ -1,4 +1,7 @@
 #include<bits/stdc++.h>
+#include<ext/pb_ds/assoc_container.hpp>
+#include<ext/pb_ds/tree_policy.hpp>
+
 
 #define     pb      push_back
 #define     eps     1e-9
@@ -14,19 +17,25 @@
 #define     Precision(x)                 cout.setf(ios::fixed); cout.precision(x);
 
 using namespace std;
+using namespace __gnu_pbds;
 typedef long double ld;
 typedef long long ll;
 typedef pair<int,int> pii;
 typedef vector<int> vii;
 typedef vector<ll> vll;
-template < class T> inline T biton(T n,T pos){return n |((T)1<<pos);}
+template < class T> inline T biton(T n,T pos){return n ((T)1<<pos);}
 template < class T> inline T bitoff(T n,T pos){return n & ~((T)1<<pos);}
 template < class T> inline T ison(T n,T pos){return (bool)(n & ((T)1<<pos));}
 template < class T> inline T gcd(T a, T b){while(b){a%=b;swap(a,b);}return a;}
+template<typename T>
+using ordered_set=tree<T,null_type,less<T>,rb_tree_tag,tree_order_statistics_node_update>;
+template<typename T>
+using ordered_multiset=tree<T, null_type, less_equal<T>, rb_tree_tag,tree_order_statistics_node_update>;
 inline int nxt(){int aaa;scanf("%d",&aaa);return aaa;}
 inline ll lxt(){ll aaa;scanf("%lld",&aaa);return aaa;}
 inline double dxt(){double aaa;scanf("%lf",&aaa);return aaa;}
-inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++) cin>>in; v.push_back(in); }
+inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++){cin>>in; v.push_back(in);} }
+inline void vout(vector<int> v){ for(auto it:v) cout<<it<<" "; cout<<endl; }
 #ifdef ARnAb
      #define debug(...) __f(#__VA_ARGS__, __VA_ARGS__)
     template < typename Arg1 >
@@ -46,7 +55,33 @@ inline void vinput(int n,vector<int> &v){ for(int in,i=0;i<n;i++) cin>>in; v.pus
 int cs=0;
 void solve()
 {
+    ordered_set<int> st;
+    st.insert(1);
+    st.insert(5);
+    st.insert(3);
+    st.insert(4);
 
+    cout<<st.order_of_key(3)<<endl;
+    cout<<*st.find_by_order(2)<<endl;
+
+    st.erase(3);
+    st.erase(st.find_by_order(1));
+
+    ordered_multiset<int> ms;
+    ms.insert(1);
+    ms.insert(1);
+    ms.insert(1);
+    ms.insert(1);
+    ms.insert(5);
+    ms.insert(5);
+    ms.insert(5);
+    ms.insert(2);
+
+    cout<<ms.order_of_key(2)<<endl;
+    cout<<*ms.find_by_order(4)<<endl;
+
+    ms.erase(ms.find_by_order(ms.order_of_key(5)));
+    cout<<ms.size()<<endl;
 }
 int main()
 {
@@ -58,7 +93,7 @@ int main()
         ///freopen ("input.txt","r",stdin);
     #endif
     int tc=1;
-    cin>>tc;
+    ///cin>>tc;
     while(tc--)
         solve();
     return 0;
